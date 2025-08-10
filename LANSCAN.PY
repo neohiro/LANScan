@@ -93,6 +93,7 @@ class NetworkMapperGUI:
         self._create_widgets()
         self._initialize_scan()
         self.active_copy_button = None # Store the active copy button
+        self.last_clicked_ip = None # Store the last clicked IP address for toggling the button
 
     
     def _setup_style(self):
@@ -162,6 +163,23 @@ class NetworkMapperGUI:
         
         self.scrollable_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
         self.master.bind("<Configure>", lambda e: self.master.after(100, lambda: self.canvas.itemconfig(self.canvas_frame_id, width=self.canvas.winfo_width())))
+        
+        # Bind mouse wheel scrolling to the main window
+        self.master.bind("<MouseWheel>", self._on_mouse_scroll)
+        # Bindings for macOS
+        self.master.bind("<Button-4>", self._on_mouse_scroll)
+        self.master.bind("<Button-5>", self._on_mouse_scroll)
+
+    def _on_mouse_scroll(self, event):
+        """Handles mouse wheel scrolling across the entire window."""
+        # For Windows and most Linux
+        if event.delta:
+            self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        # For macOS
+        elif event.num == 4:
+            self.canvas.yview_scroll(-1, "units")
+        elif event.num == 5:
+            self.canvas.yview_scroll(1, "units")
 
     def _initialize_scan(self):
         """Populates interfaces and starts the initial passive scan."""
@@ -274,8 +292,8 @@ class NetworkMapperGUI:
         device = self.devices[ip]
         if ip in self.device_widgets:
             widgets = self.device_widgets[ip]
-            widgets["hostname"].config(text=f"Hostname: {device['hostname']}")
             widgets["ip"].config(text=f"IP Address: {device['ip']}")
+            widgets["hostname"].config(text=f"Hostname: {device['hostname']}")
             mac_text = f"MAC Address: {device['mac']}" if device['mac'] else "MAC Address: N/A"
             widgets["mac"].config(text=mac_text)
         else:
@@ -284,14 +302,18 @@ class NetworkMapperGUI:
             # Bind the click event to call the toggle copy option
             card.bind("<Button-1>", lambda e, ip_addr=ip: self._toggle_copy_option(ip_addr))
 
+            # Reordered labels and adjusted padding for better spacing
             labels = {
-                "hostname": ttk.Label(card, text=f"Hostname: {device['hostname']}", style="DeviceHeader.TLabel"),
-                "ip": ttk.Label(card, text=f"IP Address: {device['ip']}", style="DeviceDetail.TLabel"),
+                "ip": ttk.Label(card, text=f"IP Address: {device['ip']}", style="DeviceHeader.TLabel"),
+                "hostname": ttk.Label(card, text=f"Hostname: {device['hostname']}", style="DeviceDetail.TLabel"),
                 "mac": ttk.Label(card, text=f"MAC Address: {device['mac'] or 'N/A'}", style="DeviceDetail.TLabel")
             }
+            labels["ip"].pack(anchor="w", padx=(10, 0), pady=(5, 2))  # Added top padding here
+            labels["hostname"].pack(anchor="w", padx=(10, 0), pady=(0, 2))
+            labels["mac"].pack(anchor="w", padx=(10, 0), pady=(0, 5))
+            
+            # Also bind the click event for the labels inside the card
             for label in labels.values():
-                label.pack(anchor="w", padx=(10, 0))
-                # Also bind the click event for the labels inside the card
                 label.bind("<Button-1>", lambda e, ip_addr=ip: self._toggle_copy_option(ip_addr))
 
             self.device_widgets[ip] = {"frame": card, **labels}

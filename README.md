@@ -1,4 +1,4 @@
 # LANSCAN
 ARP / ICMP Passive &amp; Active Network Scanner for Windows &amp; Linux
 
-<img width="797" height="803" alt="image" src="https://github.com/user-attachments/assets/e87dc661-f98a-4efa-9686-5675c338b353" />
+<img width="800" height="1045" alt="image" src="https://github.com/user-attachments/assets/d0d150ff-ea9b-4c77-b851-0eed2f1ee602" />

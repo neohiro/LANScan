@@ -5,6 +5,10 @@
 
 ARP / ICMP Passive & Active Network Scanner
 
+**Live dashboard: <https://neohiro.github.io/lanscan/>** — inventory of every
+device on your LAN, every USB device and every driver, rendered locally with no
+telemetry. See [DASHBOARD.md](DASHBOARD.md) for where it lives and why.
+
 You will have to run sudo ./LANScan on Linux.
 
 <img width="800" height="1045" alt="image" src="https://github.com/user-attachments/assets/d0d150ff-ea9b-4c77-b851-0eed2f1ee602" />
